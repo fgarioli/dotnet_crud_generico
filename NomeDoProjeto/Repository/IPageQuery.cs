@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 
-namespace NomeDoProjeto.Dto
+namespace NomeDoProjeto.Repository
 {
     public interface IPageQuery<T>
     {

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NomeDoProjeto.Context;
-using NomeDoProjeto.Dto;
+using NomeDoProjeto.Repository;
 using NomeDoProjeto.Models;
 
 namespace NomeDoProjeto.Repository
@@ -21,10 +21,10 @@ namespace NomeDoProjeto.Repository
             this.DbSet.Add(obj);
         }
 
-        public void Update(T obj)
+        public void Update(T entity, T updatedEntity)
         {
-            DbSet.Attach(obj);
-            this._dbContext.Entry(obj).State = EntityState.Modified;
+            DbSet.Attach(entity);
+            this._dbContext.Entry(entity).CurrentValues.SetValues(updatedEntity);
         }
 
         public void Delete(object id)

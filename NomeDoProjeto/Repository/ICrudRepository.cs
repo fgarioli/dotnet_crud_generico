@@ -1,13 +1,11 @@
-using NomeDoProjeto.Dto;
-
 namespace NomeDoProjeto.Repository
 {
-    public interface ICrudRepository<TEntity> where TEntity : class
+    public interface ICrudRepository<T> where T : class
     {
-        void Create(TEntity obj);
-        void Update(TEntity obj);
+        void Create(T obj);
+        void Update(T entity, T updatedEntity);
         void Delete(object id);
-        TEntity? Read(int id);
-        Page<TEntity> Read(IPageQuery<TEntity> pageQuery);
+        T? Read(int id);
+        Page<T> Read(IPageQuery<T> pageQuery);
     }
 }

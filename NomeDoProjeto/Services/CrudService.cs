@@ -1,4 +1,6 @@
+using Newtonsoft.Json.Linq;
 using NomeDoProjeto.Dto;
+using NomeDoProjeto.Exceptions;
 using NomeDoProjeto.Repository;
 using NomeDoProjeto.UnitOfWork;
 
@@ -22,9 +24,21 @@ namespace NomeDoProjeto.Services
             this._unitOfWork.Commit();
         }
 
-        public void Update(T obj)
+        public void Update(int id, T obj)
         {
-            this._repository.Update(obj);
+            var entity = this._repository.Read(id);
+            if (entity == null)
+                throw new NotFoundException();
+            var originalJson = JObject.FromObject(entity);
+            var jObject = JObject.FromObject(obj);
+            originalJson.Merge(jObject, new JsonMergeSettings
+            {
+                MergeArrayHandling = MergeArrayHandling.Merge
+            });
+            var updatedEntity = jObject.ToObject<T>();
+            if (updatedEntity == null)
+                throw new BadRequestException();
+            this._repository.Update(entity, updatedEntity);
             this._unitOfWork.Commit();
         }
 
@@ -39,7 +53,7 @@ namespace NomeDoProjeto.Services
             return this._repository.Read(id);
         }
 
-        public Page<T> Read()
+        public Page<T> Read(IPageQueryDto<T> pageQuery)
         {
             return this._repository.Read(new PageQuery<T>());
         }

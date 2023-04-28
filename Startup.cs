@@ -1,9 +1,11 @@
 using Microsoft.OpenApi.Models;
 using NomeDoProjeto.Context;
+using NomeDoProjeto.Exceptions;
 using NomeDoProjeto.Models;
 using NomeDoProjeto.Repository;
 using NomeDoProjeto.Services;
 using NomeDoProjeto.UnitOfWork;
+using NomeDoProjeto.Utils;
 
 namespace NomeDoProjeto
 {
@@ -18,6 +20,13 @@ namespace NomeDoProjeto
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddControllers();
+            services.
+                AddMvc(o => o.Conventions.Add(
+                    new GenericControllerRouteConvention()
+                )).
+                ConfigureApplicationPartManager(m =>
+                    m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()
+                ));
 
             services.AddDbContext<ApplicationDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
@@ -40,6 +49,10 @@ namespace NomeDoProjeto
             {
                 endpoints.MapControllers();
             });
+
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            app.UseDeveloperExceptionPage();
         }
     }
 }

@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using NomeDoProjeto.Models;
 
 namespace NomeDoProjeto.Context
 {
@@ -18,16 +17,7 @@ namespace NomeDoProjeto.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            var type = typeof(IAutoMap);
-            var types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(s => s.GetTypes())
-                .Where(p => type.IsAssignableFrom(p));
-
-            foreach (var t in types)
-            {
-                modelBuilder.Entity(t);
-                t.GetMethod("OnModelCreating")?.Invoke(null, new object[] { modelBuilder });
-            }
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

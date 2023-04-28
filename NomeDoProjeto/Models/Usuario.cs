@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using NomeDoProjeto.Utils;
 
 namespace NomeDoProjeto.Models
 {
     [Table("usuario")]
+    [GeneratedControllerAttribute("/usuario")]
     public class Usuario : IAutoMap
     {
         [Column("id")]
