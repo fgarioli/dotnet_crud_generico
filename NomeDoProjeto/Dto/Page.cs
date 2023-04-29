@@ -1,4 +1,4 @@
-namespace NomeDoProjeto.Repository
+namespace NomeDoProjeto.Dto
 {
     public class Page<T>
     {

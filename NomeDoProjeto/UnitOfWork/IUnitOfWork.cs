@@ -1,9 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace NomeDoProjeto.UnitOfWork
 {
-    public interface IUnitOfWork
+    public interface IUnitOfWork : IDisposable
     {
-        void BeginTransaction();
-        void Rollback();
-        void Commit();
+        public DbContext Context { get; }
+        Task<int> SaveChangesAsync();
+        Task BeginTransactionAsync();
+        Task CommitTransactionAsync();
+        Task RollbackTransactionAsync();
     }
 }

@@ -14,9 +14,13 @@ namespace NomeDoProjeto.Utils
 
             foreach (var candidate in candidates)
             {
-                feature.Controllers.Add(
-                    typeof(BaseController<>).MakeGenericType(candidate).GetTypeInfo()
-                );
+                var attribute = candidate.GetCustomAttribute<GeneratedControllerAttribute>();
+                Type[] typeArgs = { candidate, attribute.CreateCommand, attribute.UpdateCommand, attribute.DeleteCommand, attribute.FindByIdQuery, attribute.FindQuery };
+                var type = typeof(BaseController<,,,,,>)
+                        .MakeGenericType(typeArgs)
+                        .GetTypeInfo();
+
+                feature.Controllers.Add(type);
             }
         }
     }

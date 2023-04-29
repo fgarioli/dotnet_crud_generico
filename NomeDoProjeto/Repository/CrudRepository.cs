@@ -1,48 +1,51 @@
 using Microsoft.EntityFrameworkCore;
-using NomeDoProjeto.Context;
-using NomeDoProjeto.Repository;
-using NomeDoProjeto.Models;
+using NomeDoProjeto.Dto;
+using NomeDoProjeto.UnitOfWork;
 
 namespace NomeDoProjeto.Repository
 {
-    public class CrudRepository<T> : ICrudRepository<T> where T : class, IAutoMap
+    public class CrudRepository<T> : ICrudRepository<T> where T : class
     {
-        protected readonly ApplicationDbContext _dbContext;
-        public DbSet<T> DbSet;
+        public IUnitOfWork UnitOfWork { get; }
+        private readonly DbContext _dbContext;
+        private readonly DbSet<T> _dbSet;
 
-        public CrudRepository(ApplicationDbContext dbContext)
+        public CrudRepository(IUnitOfWork unitOfWork)
         {
-            _dbContext = dbContext ?? throw new ArgumentNullException("dbContext");
-            DbSet = dbContext.Set<T>();
+            UnitOfWork = unitOfWork;
+            _dbContext = unitOfWork.Context;
+            _dbSet = _dbContext.Set<T>();
         }
 
-        public void Create(T obj)
+        public virtual async Task AddAsync(T entity)
         {
-            this.DbSet.Add(obj);
+            await _dbSet.AddAsync(entity);
         }
 
-        public void Update(T entity, T updatedEntity)
+        public virtual void Update(T entity)
         {
-            DbSet.Attach(entity);
-            this._dbContext.Entry(entity).CurrentValues.SetValues(updatedEntity);
+            _dbSet.Attach(entity);
+            _dbContext.Entry(entity).State = EntityState.Modified;
         }
 
-        public void Delete(object id)
+        public void Merge(T entity, T requestEntity)
         {
-            T? entityToDelete = DbSet.Find(id);
-            if (entityToDelete == null)
-                throw new Exception("Entity not found");
-            Delete(entityToDelete);
+            _dbContext.Entry(entity).CurrentValues.SetValues(requestEntity);
         }
 
-        public T? Read(int id)
+        public void Delete(T entity)
         {
-            return this.DbSet.Find(id);
+            _dbSet.Remove(entity);
         }
 
-        public Page<T> Read(IPageQuery<T> pageQuery)
+        public async Task<T?> FindByIdAsync(int id)
         {
-            IQueryable<T> query = this.DbSet;
+            return await this._dbSet.FindAsync(id);
+        }
+
+        public async Task<Page<T>> FindAsync(IPageQuery<T> pageQuery)
+        {
+            IQueryable<T> query = this._dbSet;
 
             if (pageQuery.Filter != null)
             {
@@ -66,7 +69,7 @@ namespace NomeDoProjeto.Repository
             result.PageCount = (int)Math.Ceiling(pageCount);
 
             var skip = (pageQuery.Page - 1) * pageQuery.PageSize;
-            result.PageItems = query.Skip(skip).Take(pageQuery.PageSize).ToList();
+            result.PageItems = await query.Skip(skip).Take(pageQuery.PageSize).ToListAsync();
 
             return result;
         }

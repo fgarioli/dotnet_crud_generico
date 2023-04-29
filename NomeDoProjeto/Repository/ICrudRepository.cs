@@ -1,11 +1,16 @@
+using NomeDoProjeto.Dto;
+using NomeDoProjeto.UnitOfWork;
+
 namespace NomeDoProjeto.Repository
 {
     public interface ICrudRepository<T> where T : class
     {
-        void Create(T obj);
-        void Update(T entity, T updatedEntity);
-        void Delete(object id);
-        T? Read(int id);
-        Page<T> Read(IPageQuery<T> pageQuery);
+        public IUnitOfWork UnitOfWork { get; }
+        Task AddAsync(T entity);
+        void Update(T entity);
+        void Merge(T entity, T requestEntity);
+        void Delete(T entity);
+        Task<T?> FindByIdAsync(int id);
+        Task<Page<T>> FindAsync(IPageQuery<T> pageQuery);
     }
 }

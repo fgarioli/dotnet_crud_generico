@@ -1,56 +1,61 @@
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using NomeDoProjeto.Domain.Generic.Commands;
+using NomeDoProjeto.Domain.Generic.Queries;
 using NomeDoProjeto.Dto;
-using NomeDoProjeto.Repository;
-using NomeDoProjeto.Services;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace NomeDoProjeto.Controllers
 {
     [Route("[controller]")]
     [ApiController]
-    public class BaseController<T> : ControllerBase where T : class
+    public class BaseController<TEntity, TCreateCommand, TUpdateCommand, TDeleteCommand, TFindByIdQuery, TFindQuery> : ControllerBase
+        where TEntity : class, new()
+        where TCreateCommand : CreateCommand<TEntity>, new()
+        where TUpdateCommand : UpdateCommand<TEntity>, new()
+        where TDeleteCommand : DeleteCommand<TEntity>, new()
+        where TFindByIdQuery : FindByIdQuery<TEntity>, new()
+        where TFindQuery : FindQuery<TEntity>, new()
     {
-        private readonly ICrudService<T> _service;
+        private readonly IMediator _mediator;
 
-        public BaseController(ICrudService<T> service)
-        {
-            this._service = service;
-        }
+        public BaseController(IMediator mediator) => _mediator = mediator;
 
         [HttpPost]
         [SwaggerResponse(201, "Registro criado.")]
-        public ActionResult<T> Create([FromBody] T obj)
+        public async Task<ActionResult<TEntity>> Create([FromBody] TCreateCommand command)
         {
-            this._service.Create(obj);
-            return Created("", obj);
+            var entity = await this._mediator.Send(command);
+            return Created("", entity);
         }
 
         [HttpPut("{id}")]
         [SwaggerResponse(200, "Registro atualizado.")]
         [SwaggerResponse(400, "Requisição inválida.")]
         [SwaggerResponse(404, "Registro não encontrado.")]
-        public ActionResult<T> Update(int id, [FromBody] T obj)
+        public async Task<ActionResult<TEntity>> Update(int id, [FromBody] TUpdateCommand command)
         {
-            this._service.Update(id, obj);
-            return Ok(this._service.Read(id));
+            command.Id = id;
+            var entity = await this._mediator.Send(command);
+            return Ok(entity);
         }
 
         [HttpDelete("{id}")]
         [SwaggerResponse(204, "Registro excluído.")]
         [SwaggerResponse(404, "Registro não encontrado.")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            this._service.Delete(id);
+            await this._mediator.Send(new TDeleteCommand { Id = id });
             return NoContent();
         }
 
         [HttpGet("{id}")]
         [SwaggerResponse(200, "Registro encontrado.")]
         [SwaggerResponse(404, "Registro não encontrado.")]
-        public ActionResult<T> Read(int id) => Ok(this._service.Read(id));
+        public async Task<ActionResult<TEntity>> FindById(int id) => Ok(await this._mediator.Send(new TFindByIdQuery { Id = id }));
 
         [HttpGet]
         [SwaggerResponse(200, "Registros encontrados.")]
-        public ActionResult<Page<T>> Read([FromQuery] IPageQueryDto<T> query) => Ok(this._service.Read(query));
+        public async Task<ActionResult<Page<TEntity>>> Find([FromQuery] TFindQuery query) => Ok(await this._mediator.Send(query));
     }
 }

@@ -1,38 +1,38 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
+using NomeDoProjeto.Domain.Usuario.Command;
+using NomeDoProjeto.Domain.Usuario.Queries;
 using NomeDoProjeto.Utils;
 
-namespace NomeDoProjeto.Models
+namespace NomeDoProjeto.Domain
 {
     [Table("usuario")]
-    [GeneratedControllerAttribute("/usuario")]
-    public class Usuario : IAutoMap
+    [GeneratedControllerAttribute("/usuario",
+        createCommand: typeof(UsuarioCreateCommand),
+        updateCommand: typeof(UsuarioUpdateCommand),
+        findQuery: typeof(UsuarioFindQuery)
+    )]
+    public class UsuarioEntity
     {
         [Column("id")]
         [Key]
         public int Id { get; set; }
 
         [Column("nome", TypeName = "varchar(100)")]
-        [Required(ErrorMessage = "O nome é obrigatório")]
         public string Nome { get; set; }
 
         [Column("email")]
-        [Required(ErrorMessage = "O email é obrigatório")]
         public string Email { get; set; }
 
         [Column("senha")]
-        [Required(ErrorMessage = "O email é obrigatório")]
         public string Senha { get; set; }
 
-        public Usuario(int id, string nome, string email, string senha)
+        public UsuarioEntity(int id, string nome, string email, string senha)
         {
             Id = id;
             Nome = nome;
             Email = email;
             Senha = senha;
         }
-
-        public static void OnModelCreating(ModelBuilder modelBuilder) => modelBuilder.UseSerialColumns();
     }
 }

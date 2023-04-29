@@ -1,9 +1,8 @@
 using Microsoft.OpenApi.Models;
 using NomeDoProjeto.Context;
+using NomeDoProjeto.Domain;
 using NomeDoProjeto.Exceptions;
-using NomeDoProjeto.Models;
 using NomeDoProjeto.Repository;
-using NomeDoProjeto.Services;
 using NomeDoProjeto.UnitOfWork;
 using NomeDoProjeto.Utils;
 
@@ -20,6 +19,7 @@ namespace NomeDoProjeto
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddControllers();
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly));
             services.
                 AddMvc(o => o.Conventions.Add(
                     new GenericControllerRouteConvention()
@@ -30,8 +30,7 @@ namespace NomeDoProjeto
 
             services.AddDbContext<ApplicationDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-            services.AddScoped<ICrudService<Usuario>, CrudService<Usuario>>();
-            services.AddScoped<ICrudRepository<Usuario>, CrudRepository<Usuario>>();
+            services.AddScoped<ICrudRepository<UsuarioEntity>, CrudRepository<UsuarioEntity>>();
         }
 
         public void Configure(IApplicationBuilder app)
