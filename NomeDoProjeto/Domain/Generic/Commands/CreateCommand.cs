@@ -1,8 +1,7 @@
 using MediatR;
 
-namespace NomeDoProjeto.Domain.Generic.Commands
+namespace NomeDoProjeto.Domain.Generic.Commands;
+
+public interface CreateCommand<T> : IRequest<T> where T : class
 {
-    public interface CreateCommand<T> : IRequest<T> where T : class
-    {
-    }
 }

@@ -1,9 +1,10 @@
 using MediatR;
 
-namespace NomeDoProjeto.Domain.Generic.Queries
+namespace NomeDoProjeto.Domain.Generic.Queries;
+
+public class FindByIdQuery<T> : IRequest<T> where T : class
 {
-    public interface FindByIdQuery<T> : IRequest<T> where T : class
-    {
-        int Id { get; set; }
-    }
+    public int Id { get; set; }
+
+    public FindByIdQuery(int id) => this.Id = id;
 }

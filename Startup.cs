@@ -28,9 +28,11 @@ namespace NomeDoProjeto
                     m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()
                 ));
 
+            services.AddAutoRegistrations(typeof(Startup).Assembly);
+
             services.AddDbContext<ApplicationDbContext>();
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-            services.AddScoped<ICrudRepository<UsuarioEntity>, CrudRepository<UsuarioEntity>>();
+            // services.AddScoped<ICrudRepository<UsuarioEntity>, CrudRepository<UsuarioEntity>>();
         }
 
         public void Configure(IApplicationBuilder app)

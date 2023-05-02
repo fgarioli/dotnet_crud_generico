@@ -5,9 +5,10 @@ using NomeDoProjeto.Repository;
 
 namespace NomeDoProjeto.Handlers.Generic
 {
-    public class CreateHandler<TEntity, TCreateCommand> : IRequestHandler<TCreateCommand, TEntity>
-        where TEntity : class, new()
-        where TCreateCommand : CreateCommand<TEntity>, new()
+    public class CreateHandler<TEntity, TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+        where TEntity : class
+        where TRequest : CreateCommand<TResponse>
+        where TResponse : class
     {
         private readonly ICrudRepository<TEntity> _repository;
 
@@ -16,14 +17,14 @@ namespace NomeDoProjeto.Handlers.Generic
             _repository = repository;
         }
 
-        public async Task<TEntity> Handle(TCreateCommand request, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
         {
             var entity = request.Adapt<TEntity>();
 
             await this._repository.AddAsync(entity);
             await this._repository.UnitOfWork.SaveChangesAsync();
 
-            return entity;
+            return entity.Adapt<TResponse>();
         }
     }
 }

@@ -6,9 +6,10 @@ using NomeDoProjeto.Repository;
 
 namespace NomeDoProjeto.Handlers.Generic
 {
-    public class UpdateHandler<TEntity, TUpdateCommand> : IRequestHandler<TUpdateCommand, TEntity>
-        where TEntity : class, new()
-        where TUpdateCommand : UpdateCommand<TEntity>, new()
+    public class UpdateHandler<TEntity, TRequest, TResponse> : IRequestHandler<TRequest, TResponse>
+        where TEntity : class
+        where TRequest : UpdateCommand<TResponse>
+        where TResponse : class
     {
         private readonly ICrudRepository<TEntity> _repository;
 
@@ -17,7 +18,7 @@ namespace NomeDoProjeto.Handlers.Generic
             _repository = repository;
         }
 
-        public async Task<TEntity> Handle(TUpdateCommand request, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(TRequest request, CancellationToken cancellationToken)
         {
             var entity = await this._repository.FindByIdAsync(request.Id);
             if (entity == null)
@@ -28,7 +29,7 @@ namespace NomeDoProjeto.Handlers.Generic
             this._repository.Merge(entity, updatedEntity);
             await this._repository.UnitOfWork.SaveChangesAsync();
 
-            return updatedEntity;
+            return updatedEntity.Adapt<TResponse>();
         }
     }
 }

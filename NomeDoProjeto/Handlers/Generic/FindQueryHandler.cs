@@ -5,9 +5,10 @@ using NomeDoProjeto.Repository;
 
 namespace NomeDoProjeto.Handlers.Generic
 {
-    public class FindQueryHandler<TEntity, TFindQuery> : IRequestHandler<TFindQuery, Page<TEntity>>
-        where TEntity : class, new()
-        where TFindQuery : FindQuery<TEntity>, new()
+    public class FindQueryHandler<TEntity, TRequest, TResponse> : IRequestHandler<TRequest, Page<TResponse>>
+        where TEntity : class
+        where TRequest : FindQuery<TResponse>
+        where TResponse : class
     {
         private readonly ICrudRepository<TEntity> _repository;
 
@@ -16,7 +17,7 @@ namespace NomeDoProjeto.Handlers.Generic
             _repository = repository;
         }
 
-        public async Task<Page<TEntity>> Handle(TFindQuery request, CancellationToken cancellationToken)
+        public async Task<Page<TResponse>> Handle(TRequest request, CancellationToken cancellationToken)
         {
             // var entity = await this._repository.FindAsync(request);
             // return entity;

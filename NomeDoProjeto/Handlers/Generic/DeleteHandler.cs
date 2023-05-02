@@ -5,7 +5,9 @@ using NomeDoProjeto.Repository;
 
 namespace NomeDoProjeto.Handlers.Generic
 {
-    public class DeleteHandler<TEntity> : IRequestHandler<DeleteCommand<TEntity>, bool> where TEntity : class
+    public class DeleteHandler<TEntity, TRequest> : IRequestHandler<TRequest, bool>
+        where TEntity : class
+        where TRequest : DeleteCommand<TEntity>
     {
         private readonly ICrudRepository<TEntity> _repository;
 
@@ -14,7 +16,7 @@ namespace NomeDoProjeto.Handlers.Generic
             _repository = repository;
         }
 
-        public async Task<bool> Handle(DeleteCommand<TEntity> request, CancellationToken cancellationToken)
+        public async Task<bool> Handle(TRequest request, CancellationToken cancellationToken)
         {
             var entity = await this._repository.FindByIdAsync(request.Id);
             if (entity == null)
