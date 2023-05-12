@@ -1,6 +1,7 @@
-using Microsoft.EntityFrameworkCore;
-
 namespace NomeDoProjeto.Context;
+
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 
 public class ApplicationDbContext : DbContext
 {
@@ -18,5 +19,6 @@ public class ApplicationDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        modelBuilder.RegisterAllEntities(Assembly.GetExecutingAssembly());
     }
 }

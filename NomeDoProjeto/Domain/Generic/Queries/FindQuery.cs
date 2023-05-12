@@ -1,7 +1,7 @@
+namespace NomeDoProjeto.Domain.Generic.Queries;
+
 using MediatR;
 using NomeDoProjeto.Dto;
-
-namespace NomeDoProjeto.Domain.Generic.Queries;
 
 public interface FindQuery<T> : IRequest<Page<T>> where T : class
 {

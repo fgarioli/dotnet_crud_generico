@@ -3,6 +3,7 @@ using MediatR;
 using NomeDoProjeto.Domain.Generic.Commands;
 using NomeDoProjeto.Exceptions;
 using NomeDoProjeto.Repository;
+using NomeDoProjeto.Utils;
 
 namespace NomeDoProjeto.Handlers.Generic
 {

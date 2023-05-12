@@ -1,59 +1,62 @@
-using Microsoft.OpenApi.Models;
+namespace NomeDoProjeto;
+
+using MediatR;
+using NomeDoProjeto.Config;
 using NomeDoProjeto.Context;
-using NomeDoProjeto.Domain;
-using NomeDoProjeto.Exceptions;
 using NomeDoProjeto.Repository;
 using NomeDoProjeto.UnitOfWork;
 using NomeDoProjeto.Utils;
+using NomeDoProjeto.Utils.Filters;
 
-namespace NomeDoProjeto
+public class Startup
 {
-    public class Startup
+    public void ConfigureServices(IServiceCollection services)
     {
-        public void ConfigureServices(IServiceCollection services)
+        var assembly = typeof(Startup).Assembly;
+        services.AddSwaggerSupport();
+        services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+        var mvcBuilder = services.AddControllers(options =>
         {
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Minha API", Version = "v1" });
-            });
-            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            options.Conventions.Add(new ApiResourceRouteConvention());
+            options.Filters.Add(typeof(ValidateModelAttribute));
+        })
+        .ConfigureApplicationPartManager(m => m.FeatureProviders.Add(new ApiResourceFeatureProvider()));
 
-            services.AddControllers();
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Startup).Assembly));
-            services.
-                AddMvc(o => o.Conventions.Add(
-                    new GenericControllerRouteConvention()
-                )).
-                ConfigureApplicationPartManager(m =>
-                    m.FeatureProviders.Add(new GenericTypeControllerFeatureProvider()
-                ));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(assembly));
+        services.AddMapsterSupport(assembly);
 
-            services.AddAutoRegistrations(typeof(Startup).Assembly);
+        services.AddLocalizationSupport(mvcBuilder);
 
-            services.AddDbContext<ApplicationDbContext>();
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-            // services.AddScoped<ICrudRepository<UsuarioEntity>, CrudRepository<UsuarioEntity>>();
-        }
+        services.AddDefaultHandlers(assembly);
 
-        public void Configure(IApplicationBuilder app)
+        services.AddDbContext<ApplicationDbContext>();
+        services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+
+        services.Scan(scan => scan
+            .FromAssemblyOf<Startup>()
+            .AddClasses(classes => classes.AssignableTo(typeof(ICrudRepository<>)))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime()
+        );
+
+        // Adiciona localização dos arquivos de internacionalização
+        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    {
+        app.AddLocalizationSupport();
+        app.AddSwaggerSupport();
+
+        app.UseRouting();
+
+        app.UseEndpoints(endpoints =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Minha API v1");
-                c.RoutePrefix = string.Empty;
-            });
+            endpoints.MapControllers();
+        });
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-
-            app.UseMiddleware<ExceptionMiddleware>();
-
+        if (env.IsDevelopment())
             app.UseDeveloperExceptionPage();
-        }
     }
 }

@@ -7,7 +7,7 @@ namespace NomeDoProjeto.Handlers.Generic
 {
     public class DeleteHandler<TEntity, TRequest> : IRequestHandler<TRequest, bool>
         where TEntity : class
-        where TRequest : DeleteCommand<TEntity>
+        where TRequest : DeleteCommand<bool>
     {
         private readonly ICrudRepository<TEntity> _repository;
 

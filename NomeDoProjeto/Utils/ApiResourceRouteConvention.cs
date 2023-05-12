@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 namespace NomeDoProjeto.Utils
 {
-    public class GenericControllerRouteConvention : IControllerModelConvention
+    public class ApiResourceRouteConvention : IControllerModelConvention
     {
         public void Apply(ControllerModel controller)
         {
             if (controller.ControllerType.IsGenericType)
             {
                 var genericType = controller.ControllerType.GenericTypeArguments[0];
-                var customNameAttribute = genericType.GetCustomAttribute<GeneratedControllerAttribute>();
+                var customNameAttribute = genericType.GetCustomAttribute<ApiResource>();
                 controller.ControllerName = genericType.Name;
                 if (customNameAttribute?.Route != null)
                 {

@@ -1,8 +1,8 @@
-using MediatR;
-
 namespace NomeDoProjeto.Domain.Generic.Commands;
 
-public class DeleteCommand<T> : IRequest<bool>
+using MediatR;
+
+public class DeleteCommand<T> : IRequest<T>
 {
     public int Id { get; set; }
 

@@ -1,12 +1,13 @@
-namespace NomeDoProjeto.Exceptions
-{
-    public class HttpException : Exception
-    {
-        public int HttpStatusCode { get; set; }
+using System.Net;
 
-        public HttpException(int httpStatusCode, string message) : base(message)
-        {
-            this.HttpStatusCode = httpStatusCode;
-        }
+namespace NomeDoProjeto.Exceptions;
+
+public class HttpException : Exception
+{
+    public HttpStatusCode HttpStatusCode { get; set; }
+
+    public HttpException(HttpStatusCode httpStatusCode, string message) : base(message)
+    {
+        this.HttpStatusCode = httpStatusCode;
     }
 }

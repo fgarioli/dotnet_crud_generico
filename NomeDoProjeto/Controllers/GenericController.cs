@@ -1,11 +1,13 @@
+namespace NomeDoProjeto.Controllers;
+
+using System.Net.Mime;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NomeDoProjeto.Domain.Generic.Commands;
 using NomeDoProjeto.Domain.Generic.Queries;
 using NomeDoProjeto.Dto;
+using NomeDoProjeto.Dto.Exceptions;
 using Swashbuckle.AspNetCore.Annotations;
-
-namespace NomeDoProjeto.Controllers;
 
 [Route("[controller]")]
 // [ApiController]
@@ -23,6 +25,9 @@ public class GenericController<TEntity, TCreateCommand, TUpdateCommand, TDeleteC
 
     [HttpPost]
     [SwaggerResponse(201, "Registro criado.")]
+    [SwaggerResponse(400, "Requisição inválida.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces("application/json")]
     public async Task<ActionResult<TEntity>> Create([FromBody] TCreateCommand command)
     {
         var entity = await this._mediator.Send(command);
@@ -33,6 +38,8 @@ public class GenericController<TEntity, TCreateCommand, TUpdateCommand, TDeleteC
     [SwaggerResponse(200, "Registro atualizado.")]
     [SwaggerResponse(400, "Requisição inválida.")]
     [SwaggerResponse(404, "Registro não encontrado.")]
+    [Consumes(MediaTypeNames.Application.Json)]
+    [Produces("application/json")]
     public async Task<ActionResult<TEntity>> Update(int id, [FromBody] TUpdateCommand command)
     {
         command.Id = id;
@@ -52,9 +59,11 @@ public class GenericController<TEntity, TCreateCommand, TUpdateCommand, TDeleteC
     [HttpGet("{id}")]
     [SwaggerResponse(200, "Registro encontrado.")]
     [SwaggerResponse(404, "Registro não encontrado.")]
+    [Produces("application/json")]
     public async Task<ActionResult<TEntity>> FindById(int id) => Ok(await this._mediator.Send(new FindByIdQuery<TEntity>(id)));
 
     [HttpGet]
     [SwaggerResponse(200, "Registros encontrados.")]
+    [Produces("application/json")]
     public async Task<ActionResult<Page<TEntity>>> Find([FromQuery] TFindQuery query) => Ok(await this._mediator.Send(query));
 }

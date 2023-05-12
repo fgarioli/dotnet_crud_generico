@@ -7,16 +7,16 @@ using NomeDoProjeto.Domain.Generic.Queries;
 
 namespace NomeDoProjeto.Utils
 {
-    public class GenericTypeControllerFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
+    public class ApiResourceFeatureProvider : IApplicationFeatureProvider<ControllerFeature>
     {
         public void PopulateFeature(IEnumerable<ApplicationPart> parts, ControllerFeature feature)
         {
-            var currentAssembly = typeof(GenericTypeControllerFeatureProvider).Assembly;
-            var candidates = currentAssembly.GetExportedTypes().Where(x => x.GetCustomAttributes<GeneratedControllerAttribute>().Any());
+            var currentAssembly = typeof(ApiResourceFeatureProvider).Assembly;
+            var candidates = currentAssembly.GetExportedTypes().Where(x => x.GetCustomAttributes<ApiResource>().Any());
 
             foreach (var candidate in candidates)
             {
-                var attribute = candidate.GetCustomAttribute<GeneratedControllerAttribute>();
+                var attribute = candidate.GetCustomAttribute<ApiResource>();
                 if (attribute == null)
                     continue;
 
