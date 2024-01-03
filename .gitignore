@@ -44,3 +44,7 @@ Logs/
 node_modules/
 packages/
 bower_components/
+
+# remove every bin and obj directory from git
+**/bin/
+**/obj/
